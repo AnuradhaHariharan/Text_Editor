@@ -1,7 +1,11 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
+import java.nio.Buffer;
+import java.util.jar.JarFile;
 
 public class textEditor implements ActionListener {
     JFrame frame;
@@ -15,11 +19,18 @@ public class textEditor implements ActionListener {
         menuBar=new JMenuBar();
         textarea=new JTextArea();
         textarea.setBackground(Color.white);
-        menuBar.setBackground(Color.yellow);
-        frame.add(textarea);
+        menuBar.setBackground(Color.black);
+        JPanel panel=new JPanel();
+        panel.setBorder(new EmptyBorder(5,5,5,5));
+        panel.setLayout(new BorderLayout(0,0));
+        panel.add(textarea);
+        frame.add(panel);
         frame.setJMenuBar(menuBar);
         file=new JMenu("File");
         edit=new JMenu("Edit");
+        file.setForeground(Color.white);
+        edit.setForeground(Color.white);
+        Font font = new Font("Helvetica", Font.BOLD,13);
         save=new JMenuItem("Save File");
         newfile=new JMenuItem("New");
         open =new JMenuItem("Open");
@@ -28,6 +39,8 @@ public class textEditor implements ActionListener {
         paste=new JMenuItem("Paste");
         close=new JMenuItem("Close");
         selectAll=new JMenuItem("Select All");
+        file.setFont(font);
+        edit.setFont(font);
         newfile.addActionListener(this);
         open.addActionListener(this);
         save.addActionListener(this);
@@ -70,13 +83,46 @@ public class textEditor implements ActionListener {
            textarea.selectAll();
        }
        if(e.getSource()==newfile){
+           textEditor teditor=new textEditor();
 
        }
-       if(e.getSource()==save){
+        if (e.getSource() == save) {
+            JFileChooser file = new JFileChooser("Desktop:");
+            int choose = file.showSaveDialog(null);
+            if (choose == JFileChooser.APPROVE_OPTION) {
+                File filee = file.getSelectedFile();
+                try {
+                    BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filee));
+                    textarea.write(bufferedWriter);
+                    bufferedWriter.close();
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+           }
 
        }
        if(e.getSource()==open){
+          JFileChooser filechooser=new JFileChooser("Desktop:");
+          int chooseoption=filechooser.showOpenDialog(null);
+          if(chooseoption==JFileChooser.APPROVE_OPTION){
+              File file=filechooser.getSelectedFile();
+              String filepath= file.getPath();
+              try {
+                  FileReader fileReader = new FileReader(filepath);
+                  BufferedReader bufferedReader = new BufferedReader(fileReader);
+                  String intermediate = "", output = "";
+                  while ((intermediate = bufferedReader.readLine()) != null) {
+                      output += intermediate + "\n";
+                  }
+                      bufferedReader.close();
 
+
+                  textarea.setText(output);
+              }
+              catch(Exception exception){
+                  exception.printStackTrace();
+              }
+          }
        }
     }
 }
